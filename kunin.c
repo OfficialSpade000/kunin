@@ -39,6 +39,10 @@
 const int NUM_SAMPLES = (WAVFILE_SAMPLES_PER_SECOND*2);
 int __SUM;
 int iteration;
+short waveform[NUM_SAMPLES];
+double frequency = 100.0;
+int volume = 2200;
+int length = NUM_SAMPLES;
 
 void summation(int volume, double frequency, double t){
     for (int n = 0; n < 100; n++){
@@ -49,14 +53,10 @@ void summation(int volume, double frequency, double t){
     
 
 }
-int main()
+int main(int argc, char *argv[])
 {
-	short waveform[NUM_SAMPLES];
-	double frequency = 100.0;
-	int volume = 2200;
-	int length = NUM_SAMPLES;
-	double SUM = 0;
-	//scanf("%d", &iteration);
+
+	
 	for(int x = 0; x < length; x++) {
 		double t = ((double) x / WAVFILE_SAMPLES_PER_SECOND);	
 		summation(volume, frequency, t);
@@ -70,7 +70,7 @@ int main()
 
 	FILE * f = wavfile_open("sound.wav");
 	if(!f) {
-		printf("couldn't open sound.wav for writing: %s",strerror(errno));
+		printf("couldn't create wavfile for writing: %s",strerror(errno));
 		return 1;
 	}
 
