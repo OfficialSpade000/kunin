@@ -36,16 +36,22 @@
 
 #include "wavfile.h"
 
-const int NUM_SAMPLES = (WAVFILE_SAMPLES_PER_SECOND*2);
+
 int __SUM;
-int iteration;
-short waveform[NUM_SAMPLES];
-double frequency = 100.0;
-int volume = 2200;
-int length = NUM_SAMPLES;
+int iteration = 100;
+
+
+void err(){
+    printf("Usage: [-i filename] [options]\nrun \"kunin --help\"\n");
+}
+
+void option_dec(){
+    printf("-f                   frequency (default = 100)\n"
+           "-v                   volume (default = 2200)\n");
+}
 
 void summation(int volume, double frequency, double t){
-    for (int n = 0; n < 100; n++){
+    for (int n = 0; n < iteration; n++){
         double partialSUM = (((2*(1-(pow(-1,n)))))/n*M_PI)*(volume*sin(frequency*t*n*2*M_PI));
         //printf(" SUB SUM --> %d\n", sub_data);
         __SUM += partialSUM;
@@ -53,9 +59,60 @@ void summation(int volume, double frequency, double t){
     
 
 }
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]){
 
+    if (argc == 1){
+        err();
+        exit(1);
+    }
+
+	const int NUM_SAMPLES = (WAVFILE_SAMPLES_PER_SECOND*2);
+	int length = NUM_SAMPLES;
+	char *filename = NULL;
+	int volume = 2200;
+	short waveform[NUM_SAMPLES];
+	double frequency = 100.0;
+	
+	int opt;
+    int option_index = 0;
+
+    static struct option long_options[] =
+        {
+          /* These options set a flag. */
+          {"help", no_argument,       0, 'h'},
+          {"frequency",   required_argument,       0, 'f'},
+          {"volume",     required_argument,       0, 'v'},
+          {"output",     required_argument,       0, 'o'},
+		  {"iteration",     required_argument,       0, 0},
+
+          {0, 0, 0, 0}
+        };
+
+    while ((opt = getopt_long(argc, argv, "f:v:o:h0:", long_options, &option_index)) != -1) {
+        switch (opt) {
+		case 0:
+			iteration = atoi(optarg);
+			break;
+        case 'f':
+            frequency = atoi(optarg);
+            break;
+        case 'v':
+            volume = atoi(optarg);
+            break;
+        case 'o':
+            filename = optarg;
+            break;
+        case 'h':
+            err();
+            option_dec();
+            exit(1);
+            break;            
+        case '?': /* '?' */
+            err();
+            exit(EXIT_FAILURE);
+    
+        }   
+    }	
 	
 	for(int x = 0; x < length; x++) {
 		double t = ((double) x / WAVFILE_SAMPLES_PER_SECOND);	
@@ -63,12 +120,12 @@ int main(int argc, char *argv[])
 		waveform[x] = __SUM;		
 		__SUM = 0;
 	}
-	for (int p = 0; p < 100; p++){
+	for (int p = 0; p < 3; p++){
 		printf("Value at %d is %d\n", p, waveform[p]);
 	}	
 
 
-	FILE * f = wavfile_open("sound.wav");
+	FILE * f = wavfile_open(filename);
 	if(!f) {
 		printf("couldn't create wavfile for writing: %s",strerror(errno));
 		return 1;
