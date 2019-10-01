@@ -42,7 +42,7 @@ int iteration = 100;
 
 
 void err(){
-    printf("Usage: [-i filename] [options]\nrun \"kunin --help\"\n");
+    printf("Usage: [-o filename] [options]\nrun \"kunin --help\"\n");
 }
 
 void option_dec(){
@@ -95,6 +95,7 @@ int main(int argc, char *argv[]){
 			break;
         case 'f':
             frequency = atoi(optarg);
+            printf("%d\n", atoi(optarg));
             break;
         case 'v':
             volume = atoi(optarg);
@@ -112,7 +113,11 @@ int main(int argc, char *argv[]){
             exit(EXIT_FAILURE);
     
         }   
-    }	
+    }
+	if (filename == NULL){
+		err();
+		exit(1);
+	}	
 	
 	for(int x = 0; x < length; x++) {
 		double t = ((double) x / WAVFILE_SAMPLES_PER_SECOND);	
