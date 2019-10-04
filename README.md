@@ -1,3 +1,5 @@
 Kunin
 
 A CLI that generates sounds. 
+
+To compile, run "gcc kunin.c wavfile.c -o kunin -lm
