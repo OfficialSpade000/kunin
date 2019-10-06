@@ -38,11 +38,11 @@
 
 
 int __SUM;
-int iteration = 100;
-
+int iteration = 50;
+int b = 0;
 
 void err(){
-    printf("Usage: [-o filename] [options]\nrun \"kunin --help\"\n");
+    printf("Usage: [options] [outfile]\nrun \"kunin -h\"\n");
 }
 
 void option_dec(){
@@ -65,69 +65,79 @@ int main(int argc, char *argv[]){
         err();
         exit(1);
     }
-
-	const int NUM_SAMPLES = (WAVFILE_SAMPLES_PER_SECOND*2);
-	int length = NUM_SAMPLES;
-	char *filename = NULL;
+	int duration = 2;
+	char *filename;
+	filename = argv[argc-1];
 	int volume = 2200;
-	short waveform[NUM_SAMPLES];
 	double frequency = 100.0;
-	
 	int opt;
-    int option_index = 0;
+	int option_index = 0;
 
     static struct option long_options[] =
         {
           /* These options set a flag. */
           {"help", no_argument,       0, 'h'},
-          {"frequency",   required_argument,       0, 'f'},
-          {"volume",     required_argument,       0, 'v'},
+          {"freq",   required_argument,       0, 1},
+          {"vol",     required_argument,       0, 2},
           {"output",     required_argument,       0, 'o'},
-		  {"iteration",     required_argument,       0, 0},
-
+	  {"iterate",     required_argument,       0, 0},
+	  {"duration", required_argument, 0, 3},
           {0, 0, 0, 0}
         };
 
-    while ((opt = getopt_long(argc, argv, "f:v:o:h0:", long_options, &option_index)) != -1) {
+    while ((opt = getopt_long(argc, argv, "f:v:o:hd:0:", long_options, &option_index)) != -1) {
         switch (opt) {
-		case 0:
+	case 0:
 			iteration = atoi(optarg);
 			break;
-        case 'f':
+        case 1:
             frequency = atoi(optarg);
             printf("%d\n", atoi(optarg));
             break;
-        case 'v':
+        case 2:
             volume = atoi(optarg);
             break;
         case 'o':
-            filename = optarg;
+            //filename = optarg;
             break;
         case 'h':
             err();
             option_dec();
             exit(1);
-            break;            
+            break;
+	case 3:
+	    duration = atoi(optarg);
+	    break;
         case '?': /* '?' */
             err();
             exit(EXIT_FAILURE);
-    
-        }   
+        }
     }
 	if (filename == NULL){
+		printf("filename == NULL\n");
 		err();
 		exit(1);
-	}	
-	
+	}
+	const int NUM_SAMPLES = (WAVFILE_SAMPLES_PER_SECOND*duration);
+        int length = NUM_SAMPLES;
+	short waveform[NUM_SAMPLES];
+
 	for(int x = 0; x < length; x++) {
 		double t = ((double) x / WAVFILE_SAMPLES_PER_SECOND);	
 		summation(volume, frequency, t);
-		waveform[x] = __SUM;		
+		waveform[x] = __SUM;
+		int progress = (1900)*b;
+		//printf("p=%d b=%d\n", progress, b);
+		if (progress == x){
+			b++;
+			printf("Writing: %d/%d amplitude=\"%d\"\n", x, length, __SUM);
+		}
 		__SUM = 0;
 	}
+
 	for (int p = 0; p < 3; p++){
 		printf("Value at %d is %d\n", p, waveform[p]);
-	}	
+	}
 
 
 	FILE * f = wavfile_open(filename);
@@ -135,9 +145,8 @@ int main(int argc, char *argv[]){
 		printf("couldn't create wavfile for writing: %s",strerror(errno));
 		return 1;
 	}
-
 	wavfile_write(f,waveform,length);
 	wavfile_close(f);
-
+	printf("Done Writing!!\n");
 	return 0;
 }
