@@ -1,7 +1,6 @@
-Some file are license under CC 4.0:
+Kunin is license under LGPLv2.1+.
+However, some files or library are license differently.
+
+Under CC 4.0:
 wavfile.c
 wavfile.h
-
-In combination the LGPLv2.1+ applies to kunin.
-license in this work are:
-kunin.c
