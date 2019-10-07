@@ -1,0 +1,6 @@
+Some file are license under CC 4.0 such file as
+wavfile.c
+wavfile.h
+
+GPL parts of kunin are:
+kunin.c
