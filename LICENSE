@@ -2,5 +2,6 @@ Some file are license under CC 4.0:
 wavfile.c
 wavfile.h
 
-GPL parts of kunin are:
+In combination the LGPLv2.1+ applies to kunin.
+license in this work are:
 kunin.c
